@@ -95,22 +95,15 @@ def build_image_like_tensor(n_rows:int, n_colums: int, n_channels:int, default_v
      It should be containing the default value set by default_value
   """
   # YOUR CODE HERE
-  tensor = np.ones((n_rows,n_colums,n_channels))*default_value
+  tensor = np.full((n_rows,n_colums,n_channels),default_value)
   return tensor
-
-print(build_image_like_tensor(3,4,4,255))
 
 # Create 3 different tensors with the above function containing different value between [0,255]
 # Uncomment the 3 line below and complete with your answer 
 
-
-white_like = build_image_like_tensor(16,16,3,[[[255,255,255]]])
-gray_like = build_image_like_tensor(16,16,3,[[[120,120,120]]])
-black_like = build_image_like_tensor(16,16,3,[[[6,6,6]]])
-
-print(white_like)
-print(gray_like)
-print(black_like)
+white_like = build_image_like_tensor(16,16,3,255)
+gray_like = build_image_like_tensor(16,16,3,200)
+black_like = build_image_like_tensor(16,16,3,0)
 
 # Each of the tensor that you have created can be seen as an image. Use here is the way to display it using matplotlib imshow:
 def plot_one_tensor(image_tensor: np.array):
@@ -131,14 +124,18 @@ Each channel represent respectively the R red componant, G greed componant, B bl
 # Then change them to be representing a red, a green, a blue image
 # Uncomment the 3 line below and complete with your answer 
 
-red_like = build_image_like_tensor(8,8,3,1)
-red_like[:,:,0]=1
+
+red_like = build_image_like_tensor(8,8,3,255)
 red_like[:,:,1]=0
 red_like[:,:,2]=0
 
-red_like = build_image_like_tensor(12,12,3,255)
-green_like = build_image_like_tensor(12,12,3,255)
-blue_like = build_image_like_tensor(12,12,3,255)
+green_like = build_image_like_tensor(8,8,3,0)
+green_like[:,:,1]=255
+green_like[:,:,2]=0
+
+blue_like = build_image_like_tensor(8,8,3,0)
+blue_like[:,:,1]=0
+blue_like[:,:,2]=255
 
 plot_one_tensor(red_like)
 
@@ -188,20 +185,23 @@ def normalize_tensor(input_tensor: torch.Tensor) -> torch.Tensor:
 def sigmoid(input_tensor: torch.Tensor) -> torch.Tensor:
     """Apply a sigmoid to the input Tensor"""
     # YOUR CODE HERE
-    return torch.sigmoid(input_tensor)
+    f = 1/(1+torch.exp(input_tensor))
+    return f
 
 def softmax(input_tensor: torch.Tensor)-> torch.Tensor:
     """Apply a softmax to the input tensor"""
     # YOUR CODE HERE 
-    f = nn.Softmax(dim=1)
-    return f(input_tensor)
+    exp = torch.exp(input_tensor)
+    sum_exp = np.sum(torch.exp(input_tensor),axis=1).reshape(-1,1)
+    return exp/sum_exp
 
-def target_to_one_hot(targets: torch.Tensor, num_classes=10) -> torch.Tensor:
+def target_to_one_hot(target: torch.Tensor) -> torch.Tensor:
     """Create the one hot representation of the target""" 
     # YOUR CODE HERE 
-    one_hot_matrix = torch.zeros([targets.shape[0], num_classes])
-    for i in range(targets.shape[0]):
-        one_hot_matrix[i][int(targets[i])] = 1
+    one_hot_matrix = np.zeros((target.shape[0],num_classes))
+    for i in range(0,target.shape[0]):
+        label = int(target[i])
+        one_hot_matrix[i,label] = 1
     return one_hot_matrix
 
 # However as mention above pytorch already has some built-ins function 
@@ -212,13 +212,13 @@ def target_to_one_hot(targets: torch.Tensor, num_classes=10) -> torch.Tensor:
 mat_torch = torch.arange(15, dtype=torch.float64, device=device).reshape(3,5)
 # Uncomment the line bellow to check if your implementation is correct
 
- assert torch.allclose(sigmoid(mat_torch), torch.sigmoid(mat_torch))
- print(sigmoid(mat_torch))
- print(torch.sigmoid(mat_torch))
+assert torch.allclose(sigmoid(mat_torch), torch.sigmoid(mat_torch))
+print(sigmoid(mat_torch))
+print(torch.sigmoid(mat_torch))
 
- assert torch.allclose(sotfmax(mat_torch))
- print(softmax(mat_torch))
- print(torch.softmax(mat_torch, dim=1))
+assert torch.allclose(sotfmax(mat_torch))
+print(softmax(mat_torch))
+print(torch.softmax(mat_torch, dim=1))
 
 """## Transforming our Neural network from TP1"""
 
@@ -236,10 +236,10 @@ if __name__ == "__main__":
     X_test = torch.from_numpy(X_test.astype(np.float32))
 
     y_train = target_to_one_hot(y_train)
-    #y_train = torch.from_numpy(y_train.astype(np.int32))
+    y_train = torch.from_numpy(y_train.astype(np.int32))
 
     y_test = target_to_one_hot(y_test)
-    #y_test = torch.from_numpy(y_test.astype(np.int32))
+    y_test = torch.from_numpy(y_test.astype(np.int32))
 
 """Your remember the famous `class FFNN` from **TP1** ?? 
 
@@ -281,10 +281,12 @@ class FFNN(nn.Module):
         self.model = nn.Sequential(*self.layers)
 
         # We use the built-in function to compute the loss
+        
         # TODO: Maybe try with another loss function ! 
         self.loss_function = torch.nn.MSELoss()
         # self.loss_function = torch.nn.CrossEntropyLoss()
 
+        #TODO: Maybe try with another optimizer ! 
         # We use the built-in function to update the model weights
         self.optimizer = optim.SGD(self.model.parameters(), lr=self.learning_rate, momentum=self.momentum)
 
@@ -563,7 +565,7 @@ https://github.com/zalandoresearch/fashion-mnist
 ##  First let's look at the data.
 """
 
-if __name__ == "__main__" :
+if __name__ = "__main__" :
 
   fmnist_train = FashionMNIST(os.getcwd(), train=True, download=True, transform=transforms.ToTensor())
   fmnist_train = DataLoader(fmnist_train, batch_size=32, num_workers=4, pin_memory=True)
@@ -673,7 +675,7 @@ if __name__ == "__main__":
     momentum = NotImplemented
 
 
-    model = FFNNModel()
+    model = CNNModel()
     model.to(device)
 
     # YOUR CODE HERE 
@@ -683,10 +685,10 @@ if __name__ == "__main__":
     for epoch in range(nepoch):
       print(f"training Epoch: {epoch}")
       if epoch > 0:
-        train_result = train_one_epoch(model, device, mnist_train, optimizer)
+        train_result = train_one_epoch(model, device, fmnist_train, optimizer)
         print(f"Result Training dataset {train_result}")
 
-      eval_result = evaluation(model, device, mnist_val)
+      eval_result = evaluation(model, device, fmnist_val)
       print(f"Result Test dataset {eval_result}")
 
 """## Open Analysis
@@ -699,7 +701,7 @@ Use some already trained CNN to segment YOUR image.
 In the cell below your can load a image to the notebook and use the given network to have the segmentation mask and plot it.
 """
 
-if __name__ == "__main__" :
+if __name__ = "__main__" :
     
     # TODO HERE: Upload an image to the notebook in the navigation bar on the left
     # `File` `Load File`and load an image to the notebook. 
