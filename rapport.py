@@ -48,8 +48,8 @@ import tqdm.notebook as tq
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
 # enable tpu computation
- !curl https://raw.githubusercontent.com/pytorch/xla/master/contrib/scripts/env-setup.py -o pytorch-xla-env-setup.py
- !python pytorch-xla-env-setup.py --version nightly --apt-packages libomp5 libopenblas-dev
+# !curl https://raw.githubusercontent.com/pytorch/xla/master/contrib/scripts/env-setup.py -o pytorch-xla-env-setup.py
+# !python pytorch-xla-env-setup.py --version nightly --apt-packages libomp5 libopenblas-dev
 
 # In order to have some reproducable results and easier debugging 
 # we fix the seed of random.
@@ -69,7 +69,7 @@ def print(*args, **kwargs):
 mat_numpy = np.arange(15).reshape(3, 5)
 print(mat_numpy) # Create a vector from 0 to 14 and reshape it into a Matrix 3X5
 
-print(mat_numpy.shape) # Return the size of the matrix (3, 5)
+print(mat_numpy.shape) # Return the size of the matrix: (3, 5)
 
 print(mat_numpy[0]) # Return the first row of the matrix 
 
@@ -101,9 +101,9 @@ def build_image_like_tensor(n_rows:int, n_colums: int, n_channels:int, default_v
 # Create 3 different tensors with the above function containing different value between [0,255]
 # Uncomment the 3 line below and complete with your answer 
 
-white_like = build_image_like_tensor(16,16,3,255)
-gray_like = build_image_like_tensor(16,16,3,200)
-black_like = build_image_like_tensor(16,16,3,0)
+white_like = build_image_like_tensor(255,255,3,255)
+gray_like = build_image_like_tensor(255,255,3,200)
+black_like = build_image_like_tensor(255,255,3,0)
 
 # Each of the tensor that you have created can be seen as an image. Use here is the way to display it using matplotlib imshow:
 def plot_one_tensor(image_tensor: np.array):
@@ -125,15 +125,18 @@ Each channel represent respectively the R red componant, G greed componant, B bl
 # Uncomment the 3 line below and complete with your answer 
 
 
-red_like = build_image_like_tensor(8,8,3,255)
+red_like = build_image_like_tensor(255,255,3,0)
+red_like[:,:,0]=255
 red_like[:,:,1]=0
 red_like[:,:,2]=0
 
-green_like = build_image_like_tensor(8,8,3,0)
+green_like = build_image_like_tensor(255,255,3,0)
+green_like[:,:,0]=0
 green_like[:,:,1]=255
 green_like[:,:,2]=0
 
-blue_like = build_image_like_tensor(8,8,3,0)
+blue_like = build_image_like_tensor(255,255,3,0)
+blue_like[:,:,0]=0
 blue_like[:,:,1]=0
 blue_like[:,:,2]=255
 
@@ -229,15 +232,19 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test = train_test_split(mnist_data, mnist_target, test_size=0.33, random_state=1342)
     # Change the input data to be normalize and target data to be correctly encoded 
 
+    # X_train = torch.from_numpy(X_train.astype(np.float32))
     X_train = normalize_tensor(X_train)
     X_train = torch.from_numpy(X_train.astype(np.float32))
 
+    # X_test = torch.from_numpy(X_test.astype(np.float32))
     X_test = normalize_tensor(X_test)
     X_test = torch.from_numpy(X_test.astype(np.float32))
 
+    # y_train = torch.from_numpy(y_train.astype(np.int32))
     y_train = target_to_one_hot(y_train)
     y_train = torch.from_numpy(y_train.astype(np.int32))
 
+    # y_test = torch.from_numpy(y_test.astype(np.int32))
     y_test = target_to_one_hot(y_test)
     y_test = torch.from_numpy(y_test.astype(np.int32))
 
@@ -264,9 +271,8 @@ class FFNN(nn.Module):
 
         # We use the built-in activation functions
         # TODO: Maybe try with another activation function ! 
-        self.activation = torch.nn.Sigmoid()
-        # self.activation = torch.nn.ReLU()
-
+        # self.activation = torch.nn.Sigmoid()
+        self.activation = torch.nn.ReLU()
 
         self.last_activation = torch.nn.Softmax(dim=1)
 
@@ -300,7 +306,7 @@ class FFNN(nn.Module):
         y_true = torch.argmax(y_true, dim=1)
         loss = self.loss_function(y_pred.float(), y_true)
         # looking at what the loss looks like
-        # print(loss)
+        print(loss)
         return loss
 
     # Even more powerful no need to code all the derivative of the different function
@@ -350,6 +356,8 @@ class FFNN(nn.Module):
           # Then we do a pass forward 
           y_pred = self.model(X_batch)
           # We compute the loss 
+          print(y_pred.shape)
+          print(y_batch.shape)
           loss = self.compute_loss(y_pred, y_batch)
           # And calculate the backward pass
           self.backward_pass(loss=loss)
@@ -513,6 +521,7 @@ Now using the numpy implement the convolution operation.
 def convolution_forward_numpy(image, kernel):
     # YOUR CODE HERE 
     NotImplemented
+    pass
 
 """Test your implementation on the two previous example and compare the results to the result manually computed."""
 
@@ -548,6 +557,7 @@ Now let's use pytorch convolution layer to do the forward pass. Use the document
 def convolution_forward_torch(image, kernel):
     # YOUR CODE HERE 
     NotImplemented
+    pass
 
 """In pytorch you can also access other layer like convolution2D, pooling layers, for example in the following cell use the __torch.nn.MaxPool2d__ to redduce the image size."""
 
@@ -565,7 +575,7 @@ https://github.com/zalandoresearch/fashion-mnist
 ##  First let's look at the data.
 """
 
-if __name__ = "__main__" :
+if __name__ == "__main__" :
 
   fmnist_train = FashionMNIST(os.getcwd(), train=True, download=True, transform=transforms.ToTensor())
   fmnist_train = DataLoader(fmnist_train, batch_size=32, num_workers=4, pin_memory=True)
@@ -701,7 +711,7 @@ Use some already trained CNN to segment YOUR image.
 In the cell below your can load a image to the notebook and use the given network to have the segmentation mask and plot it.
 """
 
-if __name__ = "__main__" :
+if __name__ == "__main__" :
     
     # TODO HERE: Upload an image to the notebook in the navigation bar on the left
     # `File` `Load File`and load an image to the notebook. 
@@ -732,3 +742,4 @@ if __name__ = "__main__" :
         output = model(input_batch)['out'][0]
     output_predictions = output.argmax(0)
 
+pass
