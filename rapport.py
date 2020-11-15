@@ -557,9 +557,7 @@ print(convolution_forward_numpy(I,K_1))
 print(np.array_equal(convolution_forward_numpy(I, K_0), R_0))
 
 assert np.array_equal(convolution_forward_numpy(I, K_0), R_0)
-# assert convolution_forward_numpy(I, K_0) == R_0
 assert np.array_equal(convolution_forward_numpy(I, K_1), R_1)
-# assert convolution_forward_numpy(I, K_1) == R_1
 
 """Display the result image of the convolution"""
 
@@ -574,10 +572,6 @@ def display_image(img):
 
 # display the image
 display_image(image)
-# display_image(np.pad(image[0:10,0:10,1],1,mode="constant"))
-
-print(image.shape)
-# print(image[0:10,0:10,0])
 
 # Do the convolution operation and display the resulting image
 
@@ -630,37 +624,35 @@ print(np.array_equal(convolution_forward_numpy(test_image, test_kernel), expecte
 
 def convolution_forward_torch(image, kernel):
     # YOUR CODE HERE 
-    image = torch.from_numpy(image.astype("uint8"))
-    kernel = torch.from_numpy(kernel.astype("uint8"))
+    image = torch.from_numpy(image)
+    kernel = torch.from_numpy(kernel)
+
     iH, iW = image.shape[:2]
     kH, kW = kernel.shape[:2]
     pad=1
 
     output = torch.zeros((iH, iW))
-    # image = torch.pad(image, pad, mode='constant')
     padding = nn.ConstantPad2d(pad, 0)
     image = padding(image)
-
-    print(image)
-
-    # for y in range(0,image.shape[0]-2*pad):
     for y in range(pad,iH+pad):
-        # for x in range(0,image.shape[1]-2*pad):
         for x in range(pad,iW+pad):
             extract = image[y-pad:y+pad+1,x-pad:x+pad+1]
             output[y-pad,x-pad]=torch.sum(torch.multiply(extract, kernel))
-    print(output,output.shape)
     return output
-    # return ((output/np.max(output))*255).astype("uint8")
 
+assert np.array_equal(convolution_forward_torch(I, K_0), R_0)
+assert np.array_equal(convolution_forward_torch(I, K_1), R_1)
+
+result=convolution_forward_torch(test_image,test_kernel).numpy().astype("uint8")
+print(np.pad(test_image, 1, mode='constant').astype("uint8"))
+print("convolution with")
+print(test_kernel.astype("uint8"))
+print("=")
+print(result)
+print("And should not be equal to:")
 print(expected_result)
-print(np.array_equal(convolution_forward_torch(test_image, test_kernel), expected_result))
-
-# print(torch.all(tensor_R_0.eq(convolution_forward_torch(tensor_I,tensor_K_0))))
-# print(torch.all(tensor_R_1.eq(convolution_forward_torch(tensor_I,tensor_K_1))))
-
-# assert torch.all(tensor_R_0.eq(convolution_forward_torch(tensor_I,tensor_K_0)))
-# assert torch.all(tensor_R_1.eq(convolution_forward_torch(tensor_I,tensor_K_1)))
+print("So it's:")
+print(np.array_equal(result, expected_result))
 
 """In pytorch you can also access other layer like convolution2D, pooling layers, for example in the following cell use the __torch.nn.MaxPool2d__ to redduce the image size.
 
