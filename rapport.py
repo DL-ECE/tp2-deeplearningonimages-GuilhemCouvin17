@@ -185,22 +185,22 @@ def normalize_tensor(input_tensor: torch.Tensor) -> torch.Tensor:
 def sigmoid(input_tensor: torch.Tensor) -> torch.Tensor:
     """Apply a sigmoid to the input Tensor"""
     # YOUR CODE HERE
-    # f = 1/(1+torch.exp(-input_tensor))
+    f = 1/(1+torch.exp(-input_tensor))
     # CODE FROM TP1
-    f = 1/(1+np.exp(-input_tensor))
+    # f = 1/(1+np.exp(-input_tensor))
     return f
 
 def softmax(input_tensor: torch.Tensor)-> torch.Tensor:
     """Apply a softmax to the input tensor"""
     # YOUR CODE HERE (TORCH)
-    # exp = torch.exp(input_tensor)
-    # sum_exp = torch.sum(torch.exp(input_tensor),axis=1).reshape(-1,1)
-    # return exp/sum_exp
+    exp = torch.exp(input_tensor)
+    sum_exp = torch.sum(torch.exp(input_tensor),axis=1).reshape(-1,1)
+    return exp/sum_exp
     # CODE FROM TP1 (NUMPY)
-    X_exp=np.exp(input_tensor)
-    X_sum=np.sum(X_exp,axis=1).reshape(-1,1)
-    m_softmax=X_exp/X_sum
-    return m_softmax
+    # X_exp=np.exp(input_tensor)
+    # X_sum=np.sum(X_exp,axis=1).reshape(-1,1)
+    # m_softmax=X_exp/X_sum
+    # return m_softmax
 
 def target_to_one_hot(target: torch.Tensor,num_classes=10) -> torch.Tensor:
     """Create the one hot representation of the target""" 
@@ -602,7 +602,21 @@ Now let's use pytorch convolution layer to do the forward pass. Use the document
 
 def convolution_forward_torch(image, kernel):
     # YOUR CODE HERE 
-    NotImplemented
+    iH, iW = image.shape[:2]
+    kH, kW = kernel.shape[:2]
+    pad=1
+
+    output = torch.zeros((iH, iW), dtype="float32")
+    image = torch.pad(image, pad, mode='constant')
+
+    # for y in range(0,image.shape[0]-2*pad):
+    for y in range(pad,iH+pad):
+        # for x in range(0,image.shape[1]-2*pad):
+        for x in range(pad,iW+pad):
+            extract = image[y-pad:y+pad+1,x-pad:x+pad+1]
+            output[y-pad,x-pad]=torch.sum(torch.multiply(extract, kernel))
+    return output
+    # return ((output/np.max(output))*255).astype("uint8")
 
 """In pytorch you can also access other layer like convolution2D, pooling layers, for example in the following cell use the __torch.nn.MaxPool2d__ to redduce the image size.
 
