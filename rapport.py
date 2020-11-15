@@ -485,6 +485,8 @@ I = np.array([[252,  49, 113,  11, 137],
                 [229, 53, 107, 106, 222]])
 print(f"I =")
 print(I)
+print(f"I with padding =")
+print(np.pad(I, 1, mode='constant'))
 
 K_0 = np.array([[0, 1, 0], [0, 0, 0], [0, 0, 0]])
 print(f"K_0 =")
@@ -497,12 +499,20 @@ print(K_1)
 """What is the result of convolution of $ I_0 \ast K_0 $"""
 
 # put your answer here
-R_0 = np.array([0,0])
+R_0 = np.array([[  0,   0,   0,   0,   0],
+                [252,  49, 113,  11, 137],
+                [ 18, 237, 163, 119,  53],
+                [ 90,  89, 178,  75, 247],
+                [209, 216,  48, 135, 232]])
 
 """What is the result of convolution of $ I_0 \ast K_1 $"""
 
 # put your answer here
-R_1 = np.array([0,0])
+R_1 = np.array([[1005, -173,   46, -280,  513],
+                [ 212, 1242,  646,  356,   91],
+                [ 280,  390, 1010,  295, 1040],
+                [ 942, 1048,  316,  740, 1154],
+                [1570,  738,  934,  945, 1477]])
 
 """## 2) Computation using __numpy__
 
@@ -511,11 +521,37 @@ Now using the numpy implement the convolution operation.
 
 def convolution_forward_numpy(image, kernel):
     # YOUR CODE HERE 
-    NotImplemented
+    iH, iW = image.shape[:2]
+    kH, kW = kernel.shape[:2]
+    pad=1
+
+    output = np.zeros((iH, iW), dtype="float32")
+    image = np.pad(image, pad, mode='constant')
+
+    # for y in range(0,image.shape[0]-2*pad):
+    for y in range(pad,iH+pad):
+        # for x in range(0,image.shape[1]-2*pad):
+        for x in range(pad,iW+pad):
+            # output[y,x]=np.sum(np.multiply(image[y:y+3,x:x+3], kernel))
+            # output[y-pad,x-pad]=np.sum(np.multiply(image[y-pad:y+pad+1,x-pad:x+pad+1], kernel))
+            extract = image[y-pad:y+pad+1,x-pad:x+pad+1]
+            output[y-pad,x-pad]=np.sum(np.multiply(extract, kernel))
+    return output
+    # return ((output/np.max(output))*255).astype("uint8")
+
+print(((convolution_forward_numpy(I,K_0)/np.max(convolution_forward_numpy(I,K_0)))*255).astype("uint8"))
+print(((convolution_forward_numpy(I,K_1)/np.max(convolution_forward_numpy(I,K_1)))*255).astype("uint8"))
+
+print(convolution_forward_numpy(I,K_0))
+print(convolution_forward_numpy(I,K_1))
 
 """Test your implementation on the two previous example and compare the results to the result manually computed."""
 
+print(np.array_equal(convolution_forward_numpy(I, K_0), R_0))
+
+assert np.array_equal(convolution_forward_numpy(I, K_0), R_0)
 # assert convolution_forward_numpy(I, K_0) == R_0
+assert np.array_equal(convolution_forward_numpy(I, K_1), R_1)
 # assert convolution_forward_numpy(I, K_1) == R_1
 
 """Display the result image of the convolution"""
@@ -531,13 +567,26 @@ def display_image(img):
 
 # display the image
 display_image(image)
+# display_image(np.pad(image[0:10,0:10,1],1,mode="constant"))
 
+print(image.shape)
+# print(image[0:10,0:10,0])
 
 # Do the convolution operation and display the resulting image
 
 # YOUR CODE HERE
-# output_image = convolution_forward_numpy(image, kernel) 
-# display_image(output_image)
+kernel = K_0
+output_image = np.empty(image.shape)
+output_image[...,0]=(convolution_forward_numpy(image[:,:,0], kernel)/255)
+output_image[...,1]=(convolution_forward_numpy(image[:,:,1], kernel)/255)
+output_image[...,2]=(convolution_forward_numpy(image[:,:,2], kernel)/255)
+display_image(output_image)
+
+# print(image[0:10,0:10,1])
+# print(output_image[0:10,0:10,1].astype("uint8"))
+
+# output_image.astype(np.int32)
+display_image(output_image[0:10,0:10,:])
 
 """## 3) Computation using __pytorch__
 
