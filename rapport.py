@@ -185,15 +185,22 @@ def normalize_tensor(input_tensor: torch.Tensor) -> torch.Tensor:
 def sigmoid(input_tensor: torch.Tensor) -> torch.Tensor:
     """Apply a sigmoid to the input Tensor"""
     # YOUR CODE HERE
-    f = 1/(1+torch.exp(-input_tensor))
+    # f = 1/(1+torch.exp(-input_tensor))
+    # CODE FROM TP1
+    f = 1/(1+np.exp(-M))
     return f
 
 def softmax(input_tensor: torch.Tensor)-> torch.Tensor:
     """Apply a softmax to the input tensor"""
-    # YOUR CODE HERE 
-    exp = torch.exp(input_tensor)
-    sum_exp = torch.sum(torch.exp(input_tensor),axis=1).reshape(-1,1)
-    return exp/sum_exp
+    # YOUR CODE HERE (TORCH)
+    # exp = torch.exp(input_tensor)
+    # sum_exp = torch.sum(torch.exp(input_tensor),axis=1).reshape(-1,1)
+    # return exp/sum_exp
+    # CODE FROM TP1 (NUMPY)
+    X_exp=np.exp(input_tensor)
+    X_sum=np.sum(X_exp,axis=1).reshape(-1,1)
+    m_softmax=X_exp/X_sum
+    return m_softmax
 
 def target_to_one_hot(target: torch.Tensor,num_classes=10) -> torch.Tensor:
     """Create the one hot representation of the target""" 
@@ -737,6 +744,8 @@ if __name__ == "__main__":
       eval_result = evaluation(model, device, fmnist_val)
       print(f"Result Test dataset {eval_result}")
 
+pass
+
 """## Open Analysis
 Same as TP 1 please write a short description of your experiment
 
@@ -777,5 +786,7 @@ if __name__ == "__main__" :
     with torch.no_grad():
         output = model(input_batch)['out'][0]
     output_predictions = output.argmax(0)
+
+pass
 
 pass
