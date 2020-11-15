@@ -626,16 +626,22 @@ test_image = np.ones((10, 10))
 test_kernel = np.array([[0, 2, 0], [0, 1, 0], [0, 1, 0]])
 expected_result = np.full((10, 10), 4)
 
+print(np.array_equal(convolution_forward_numpy(test_image, test_kernel), expected_result))
+
 def convolution_forward_torch(image, kernel):
     # YOUR CODE HERE 
+    image = torch.from_numpy(image.astype("uint8"))
+    kernel = torch.from_numpy(kernel.astype("uint8"))
     iH, iW = image.shape[:2]
     kH, kW = kernel.shape[:2]
     pad=1
 
     output = torch.zeros((iH, iW))
     # image = torch.pad(image, pad, mode='constant')
-    padding = nn.ConstantPad2d(1, 0)
+    padding = nn.ConstantPad2d(pad, 0)
     image = padding(image)
+
+    print(image)
 
     # for y in range(0,image.shape[0]-2*pad):
     for y in range(pad,iH+pad):
@@ -643,11 +649,15 @@ def convolution_forward_torch(image, kernel):
         for x in range(pad,iW+pad):
             extract = image[y-pad:y+pad+1,x-pad:x+pad+1]
             output[y-pad,x-pad]=torch.sum(torch.multiply(extract, kernel))
+    print(output,output.shape)
     return output
     # return ((output/np.max(output))*255).astype("uint8")
 
-print(torch.all(tensor_R_0.eq(convolution_forward_torch(tensor_I,tensor_K_0))))
-print(torch.all(tensor_R_1.eq(convolution_forward_torch(tensor_I,tensor_K_1))))
+print(expected_result)
+print(np.array_equal(convolution_forward_torch(test_image, test_kernel), expected_result))
+
+# print(torch.all(tensor_R_0.eq(convolution_forward_torch(tensor_I,tensor_K_0))))
+# print(torch.all(tensor_R_1.eq(convolution_forward_torch(tensor_I,tensor_K_1))))
 
 # assert torch.all(tensor_R_0.eq(convolution_forward_torch(tensor_I,tensor_K_0)))
 # assert torch.all(tensor_R_1.eq(convolution_forward_torch(tensor_I,tensor_K_1)))
