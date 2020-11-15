@@ -187,7 +187,7 @@ def sigmoid(input_tensor: torch.Tensor) -> torch.Tensor:
     # YOUR CODE HERE
     # f = 1/(1+torch.exp(-input_tensor))
     # CODE FROM TP1
-    f = 1/(1+np.exp(-M))
+    f = 1/(1+np.exp(-input_tensor))
     return f
 
 def softmax(input_tensor: torch.Tensor)-> torch.Tensor:
