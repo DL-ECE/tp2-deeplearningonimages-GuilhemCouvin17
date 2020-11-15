@@ -600,14 +600,42 @@ display_image(output_image[0:10,0:10,:])
 Now let's use pytorch convolution layer to do the forward pass. Use the documentation available at: https://pytorch.org/docs/stable/nn.html
 """
 
+tensor_I = torch.tensor([[252,  49, 113,  11, 137],
+                         [ 18, 237, 163, 119,  53],
+                         [ 90,  89, 178,  75, 247],
+                         [209, 216,  48, 135, 232],
+                         [229,  53, 107, 106, 222]])
+
+tensor_K_0 = torch.tensor([[0, 1, 0], [0, 0, 0], [0, 0, 0]])
+
+tensor_K_1 = torch.tensor([[1, 1, 1], [0, 5, 0], [-1, -1, -1]])
+
+tensor_R_0 = torch.tensor([[  0,   0,   0,   0,   0],
+                         [252,  49, 113,  11, 137],
+                         [ 18, 237, 163, 119,  53],
+                         [ 90,  89, 178,  75, 247],
+                         [209, 216,  48, 135, 232]])
+
+tensor_R_1 = torch.tensor([[1005, -173,   46, -280,  513],
+                         [ 212, 1242,  646,  356,   91],
+                         [ 280,  390, 1010,  295, 1040],
+                         [ 942, 1048,  316,  740, 1154],
+                         [1570,  738,  934,  945, 1477]])
+
+test_image = np.ones((10, 10))
+test_kernel = np.array([[0, 2, 0], [0, 1, 0], [0, 1, 0]])
+expected_result = np.full((10, 10), 4)
+
 def convolution_forward_torch(image, kernel):
     # YOUR CODE HERE 
     iH, iW = image.shape[:2]
     kH, kW = kernel.shape[:2]
     pad=1
 
-    output = torch.zeros((iH, iW), dtype="float32")
-    image = torch.pad(image, pad, mode='constant')
+    output = torch.zeros((iH, iW))
+    # image = torch.pad(image, pad, mode='constant')
+    padding = nn.ConstantPad2d(1, 0)
+    image = padding(image)
 
     # for y in range(0,image.shape[0]-2*pad):
     for y in range(pad,iH+pad):
@@ -617,6 +645,12 @@ def convolution_forward_torch(image, kernel):
             output[y-pad,x-pad]=torch.sum(torch.multiply(extract, kernel))
     return output
     # return ((output/np.max(output))*255).astype("uint8")
+
+print(torch.all(tensor_R_0.eq(convolution_forward_torch(tensor_I,tensor_K_0))))
+print(torch.all(tensor_R_1.eq(convolution_forward_torch(tensor_I,tensor_K_1))))
+
+# assert torch.all(tensor_R_0.eq(convolution_forward_torch(tensor_I,tensor_K_0)))
+# assert torch.all(tensor_R_1.eq(convolution_forward_torch(tensor_I,tensor_K_1)))
 
 """In pytorch you can also access other layer like convolution2D, pooling layers, for example in the following cell use the __torch.nn.MaxPool2d__ to redduce the image size.
 
@@ -644,6 +678,7 @@ if __name__ == "__main__" :
 def display_10_images(dataset):
     # YOUR CODE HERE 
     NotImplemented
+pass
 
 """What is the shape of each images
 How many images do we have
