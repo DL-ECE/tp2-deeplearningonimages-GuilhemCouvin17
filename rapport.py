@@ -692,7 +692,7 @@ def display_10_images(dataset):
     # YOUR CODE HERE 
     for idx in range(0,10):
         print("target: ",dataset.targets[idx])
-        display_image(dataset.data[idx,:,:])
+        plot_one_tensor(dataset.data[idx,:,:])
         plt.show()
 
 display_10_images(fmnist_train.dataset)
@@ -710,7 +710,7 @@ def fashion_mnist_dataset_answer():
     return {'shape': shape, 'nb_in_train_set': number_of_images_in_train_set, 'nb_in_test_set': number_of_images_in_test_set, 'number_of_classes': number_of_classes}
 
 print("target: ",fmnist_train.dataset.targets[1997])
-display_image(fmnist_train.dataset.data[1997,:,:])
+plot_one_tensor(fmnist_train.dataset.data[1997,:,:].squeeze().numpy())
 plt.show()
 
 """## Create a convolutional neural network
@@ -739,14 +739,57 @@ Softmax
 class CNNModel(nn.Module):
     def __init__(self, classes=10):
         super().__init__()
-        # YOUR CODE HERE 
-        self.conv1 = NotImplemented
+        # YOUR CODE HERE: IMPLEMENT 
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=3, kernel_size=3)
+        self.conv2 = nn.Conv2d(in_channels=3, out_channels=6, kernel_size=3)
+        
+        self.conv3 = nn.Conv2d(in_channels=6, out_channels=9, kernel_size=3)
+        self.conv4 = nn.Conv2d(in_channels=9, out_channels=12, kernel_size=3)
+
+        self.activation = torch.nn.ReLU()
+        self.max = F.max_pool2d
+        self.flat = torch.nn.Flatten()
+        self.loss_function = torch.nn.CrossEntropyLoss(reduction='sum')
+        
+        self.fc1 = nn.Linear(in_features=12*4*4, out_features=120)
+        self.fc2 = nn.Linear(in_features=120, out_features=60)
+        self.out = nn.Linear(in_features=60, out_features=10)
 
     def forward(self, input):
-        x = self.conv1(input)
-        # YOUR CODE HERE 
-        y = NotImplemented
+        # YOUR CODE HERE: IMPLEMENT
+        # conv 1
+        y = self.conv1(input)
+        y = self.activation(y)
+        y = self.conv2(y)
+        y = self.activation(y)
+        y = F.max_pool2d(y, kernel_size=2, stride=2)
+
+        # conv 2
+        y = self.conv3(y)
+        y = self.activation(y)
+        y = self.conv4(y)
+        y = self.activation(y)
+        y = F.max_pool2d(y, kernel_size=2, stride=2)
+
+        # Flatten
+        # self.flat = torch.nn.Flatten(y)
+
+        # fc1
+        y = y.reshape(-1, 12*4*4)
+        y = self.fc1(y)
+        y = self.activation(y)
+
+        # fc2
+        y = self.fc2(y)
+        y = self.activation(y)
+
+        # output
+        y = self.out(y)
         return y
+
+
+
+
 
 def train_one_epoch(model, device, data_loader, optimizer):
     train_loss = 0
@@ -757,7 +800,7 @@ def train_one_epoch(model, device, data_loader, optimizer):
         output = model(data)
 
         # YOUR CODE HERE 
-        loss = NotImplemented
+        loss = model.loss_function(output, target) # DONE
         loss.backward()
         train_loss += loss.item()
         optimizer.step()
@@ -778,7 +821,7 @@ def evaluation(model, device, data_loader):
         data, target = data.to(device), target.to(device)
         output = model(data)
         # YOUR CODE HERE 
-        eval_loss = NotImplemented
+        eval_loss += model.loss_function(output, target).item() # DONE
         prediction = output.argmax(dim=1)
         correct += torch.sum(prediction.eq(target)).item()
     result = {'loss': eval_loss / len(data_loader.dataset),
@@ -790,17 +833,18 @@ if __name__ == "__main__":
     
     # Network Hyperparameters 
     # YOUR CODE HERE 
-    minibatch_size = NotImplemented
-    nepoch = NotImplemented
-    learning_rate = NotImplemented
-    momentum = NotImplemented
+    minibatch_size = 14
+    nepoch = 18
+    learning_rate = 0.001
+    momentum = 0.85
 
 
     model = CNNModel()
     model.to(device)
-
+ 
     # YOUR CODE HERE 
-    optimizer = NotImplemented
+    # optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
+    optimizer = optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     # Train for an number of epoch 
     for epoch in range(nepoch):
@@ -812,10 +856,45 @@ if __name__ == "__main__":
       eval_result = evaluation(model, device, fmnist_val)
       print(f"Result Test dataset {eval_result}")
 
-pass
-
 """## Open Analysis
 Same as TP 1 please write a short description of your experiment
+
+Résultat: 
+
+ [ Result Test dataset {'loss': 0.3555931782722473, 'accuracy': 0.881} ]
+
+PARAMS:
+  - minibatch_size = 14
+  - nepoch = 18
+  - learning_rate = 0.001
+  - momentum = 0.85
+  - Optimizer = Adam
+
+Initialisation des paramètres: Pour obtenir le premier set de paramètres, je me suis inspiré 
+des paramètres du réseau précédent [28,50,0.1,0] puis je les ai fait varier afin de comprendre 
+leur influence sur les résultats de mon CNN --> résultat(accuracy: 0.81)
+
+- minibatch_size = 14 :
+En augmentant la taille du minibatch, on diminue le temps de compute mais on diminue aussi la précision.
+Après avoir essayé avec un minibatch de taille 100, on se rend compte que l'accuracy chute en dessous de 0.50
+En diminuant la taille du batch on augmente légèrement l'accuracy
+
+- nepoch = 18 :
+Après avoir annalysé les résultats sur 50 epochs, on se rend compte que l'accuracy et la loss finissent par diverger
+et par retomber sur les même valeur. Un aussi grand grand nombre d'epochs n'était donc pas utile. J'ai donc regardé à 
+partir de quelles epochs les résultats divergeaient et n'augmentaient plus. Et j'ai donc obtenu 18 epochs
+
+- momentum = 0.85 (lors de l'utilisation avec un optim SGD) :
+Lors de l'utilisation de l'optimizer SGD, et en utilisant le site schématisant le fonctionnement du momentum vu en cours,
+j'ai pu estimer que la bonne combinaison entre momentum et elearning_rate était [0.9,0.01].
+Lors de l'utilisation du SGD, je me suis rendu compte que les résultats divergeaient très rapidement, j'ai donc réduit 
+le momentum à 0.85 et bien que la divergeance arrive plus tard, elle bride toujours le résultat à 0.81 d'accuracy. 
+En diminuant le Learning rate à 0.005, on augmente l'accuracy à 0.85 (pas suffisant)
+
+- Optimizer: Adam && learning_rate = 0.001 :
+Pour franchir le cap des 0.85 d'accuracy j'ai décidé de changer l'optimizer et de prendre Adam avec lequel je n'utilise
+pas de momentum. J'ai gardé les paramètres vu plus haut et ai obtenu 0.87 d'accuracy. Après avoir manipulé le learning rate
+pour augmenter l'accuracy, j'ai choisi 0.001 qui me permettait de franchir les 0.88 d'accuracy.
 
 # BONUS 
 
