@@ -698,10 +698,6 @@ def fashion_mnist_dataset_answer():
     number_of_classes = 10
     return {'shape': shape, 'nb_in_train_set': number_of_images_in_train_set, 'nb_in_test_set': number_of_images_in_test_set, 'number_of_classes': number_of_classes}
 
-print("target: ",fmnist_train.dataset.targets[1997])
-plot_one_tensor(fmnist_train.dataset.data[1997,:,:].squeeze().numpy())
-plt.show()
-
 """## Create a convolutional neural network
 
 Now it's your turn to create a convolutional neural network and to train your model on the fashion mnist dataset.
