@@ -683,7 +683,8 @@ def display_10_images(dataset):
         plot_one_tensor(dataset.data[idx,:,:])
         plt.show()
 
-display_10_images(fmnist_train.dataset)
+if __name__ == "__main__" :
+    display_10_images(fmnist_train.dataset)
 
 """What is the shape of each images
 How many images do we have
