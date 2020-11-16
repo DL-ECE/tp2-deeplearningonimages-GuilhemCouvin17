@@ -669,11 +669,10 @@ https://github.com/zalandoresearch/fashion-mnist
 """
 
 if __name__ == "__main__" :
-
-  fmnist_train = FashionMNIST(os.getcwd(), train=True, download=True, transform=transforms.ToTensor())
-  fmnist_train = DataLoader(fmnist_train, batch_size=32, num_workers=4, pin_memory=True)
-  fmnist_val = FashionMNIST(os.getcwd(), train=False, download=True, transform=transforms.ToTensor())
-  fmnist_val = DataLoader(fmnist_val, batch_size=32, num_workers=4,  pin_memory=True)
+    fmnist_train = FashionMNIST(os.getcwd(), train=True, download=True, transform=transforms.ToTensor())
+    fmnist_train = DataLoader(fmnist_train, batch_size=32, num_workers=4, pin_memory=True)
+    fmnist_val = FashionMNIST(os.getcwd(), train=False, download=True, transform=transforms.ToTensor())
+    fmnist_val = DataLoader(fmnist_val, batch_size=32, num_workers=4,  pin_memory=True)
 
 """Display the 10 image from train set and 10 images from validation set, print their ground truth"""
 
