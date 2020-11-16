@@ -95,15 +95,15 @@ def build_image_like_tensor(n_rows:int, n_colums: int, n_channels:int, default_v
      It should be containing the default value set by default_value
   """
   # YOUR CODE HERE
-  tensor = np.full((n_rows,n_colums,n_channels),default_value)
-  return tensor
+  matrix = np.full((n_rows,n_colums,n_channels),default_value)
+  return matrix
 
 # Create 3 different tensors with the above function containing different value between [0,255]
 # Uncomment the 3 line below and complete with your answer 
 
-white_like = build_image_like_tensor(240,320,3,255)
-gray_like = build_image_like_tensor(240,320,3,125)
-black_like = build_image_like_tensor(240,320,3,1)
+white_like = build_image_like_tensor(320,240,3,255)
+gray_like =  build_image_like_tensor(320,240,3,125)
+black_like = build_image_like_tensor(320,240,3,1)
 
 # Each of the tensor that you have created can be seen as an image. Use here is the way to display it using matplotlib imshow:
 def plot_one_tensor(image_tensor: np.array):
@@ -675,12 +675,27 @@ if __name__ == "__main__" :
   fmnist_val = FashionMNIST(os.getcwd(), train=False, download=True, transform=transforms.ToTensor())
   fmnist_val = DataLoader(fmnist_val, batch_size=32, num_workers=4,  pin_memory=True)
 
+print("train size: ",fmnist_train.dataset.data.shape)
+print("train size: ",fmnist_train.dataset.targets.shape)
+
+print("test size: ", fmnist_val.dataset.data.shape)
+print("test size: ", fmnist_val.dataset.targets.shape)
+
+print("num_class: ",fmnist_train.dataset.targets)
+
+print(fmnist_val.dataset.targets[0])
+plt.imshow(fmnist_train.dataset.data[0,:,:], cmap='gray')
+
 """Display the 10 image from train set and 10 images from validation set, print their ground truth"""
 
 def display_10_images(dataset):
     # YOUR CODE HERE 
-    NotImplemented
-pass
+    for idx in range(0,10):
+        print("target: ",dataset.targets[idx])
+        display_image(dataset.data[idx,:,:])
+        plt.show()
+
+display_10_images(fmnist_train.dataset)
 
 """What is the shape of each images
 How many images do we have
@@ -688,13 +703,15 @@ What are the different classes
 """
 
 def fashion_mnist_dataset_answer():
-    shape = None  # replace None with the value you found
-    number_of_images_in_train_set = None
-    number_of_images_in_test_set = None
-    number_of_classes = None
+    shape = (28,28)  # replace None with the value you found
+    number_of_images_in_train_set = 60000
+    number_of_images_in_test_set = 10000
+    number_of_classes = 10
     return {'shape': shape, 'nb_in_train_set': number_of_images_in_train_set, 'nb_in_test_set': number_of_images_in_test_set, 'number_of_classes': number_of_classes}
 
-# Plot an image and the target
+print("target: ",fmnist_train.dataset.targets[1997])
+display_image(fmnist_train.dataset.data[1997,:,:])
+plt.show()
 
 """## Create a convolutional neural network
 
