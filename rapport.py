@@ -90,13 +90,13 @@ n_rowsxn_columsxn_channels that contains a default value every where
 """
 
 def build_image_like_tensor(n_rows:int, n_colums: int, n_channels:int, default_value: int)-> np.ndarray:
-  """Create a tensor of 3 dimension. 
-     It should have a shape similar to (n_rows, n_colums, n_channels)
-     It should be containing the default value set by default_value
-  """
-  # YOUR CODE HERE
-  matrix = np.full((n_rows,n_colums,n_channels),default_value)
-  return matrix
+    """Create a tensor of 3 dimension. 
+       It should have a shape similar to (n_rows, n_colums, n_channels)
+       It should be containing the default value set by default_value
+    """
+    # YOUR CODE HERE
+    matrix = np.full((n_rows,n_colums,n_channels),default_value)
+    return matrix
 
 # Create 3 different tensors with the above function containing different value between [0,255]
 # Uncomment the 3 line below and complete with your answer 
@@ -587,40 +587,40 @@ display_image(output_image)
 # print(output_image[0:10,0:10,1].astype("uint8"))
 
 # output_image.astype(np.int32)
-display_image(output_image[0:10,0:10,:])
+# display_image(output_image[0:10,0:10,:])
 
 """## 3) Computation using __pytorch__
 
 Now let's use pytorch convolution layer to do the forward pass. Use the documentation available at: https://pytorch.org/docs/stable/nn.html
 """
 
-tensor_I = torch.tensor([[252,  49, 113,  11, 137],
-                         [ 18, 237, 163, 119,  53],
-                         [ 90,  89, 178,  75, 247],
-                         [209, 216,  48, 135, 232],
-                         [229,  53, 107, 106, 222]])
+# tensor_I = torch.tensor([[252,  49, 113,  11, 137],
+#                          [ 18, 237, 163, 119,  53],
+#                          [ 90,  89, 178,  75, 247],
+#                          [209, 216,  48, 135, 232],
+#                          [229,  53, 107, 106, 222]])
 
-tensor_K_0 = torch.tensor([[0, 1, 0], [0, 0, 0], [0, 0, 0]])
+# tensor_K_0 = torch.tensor([[0, 1, 0], [0, 0, 0], [0, 0, 0]])
 
-tensor_K_1 = torch.tensor([[1, 1, 1], [0, 5, 0], [-1, -1, -1]])
+# tensor_K_1 = torch.tensor([[1, 1, 1], [0, 5, 0], [-1, -1, -1]])
 
-tensor_R_0 = torch.tensor([[  0,   0,   0,   0,   0],
-                         [252,  49, 113,  11, 137],
-                         [ 18, 237, 163, 119,  53],
-                         [ 90,  89, 178,  75, 247],
-                         [209, 216,  48, 135, 232]])
+# tensor_R_0 = torch.tensor([[  0,   0,   0,   0,   0],
+#                          [252,  49, 113,  11, 137],
+#                          [ 18, 237, 163, 119,  53],
+#                          [ 90,  89, 178,  75, 247],
+#                          [209, 216,  48, 135, 232]])
 
-tensor_R_1 = torch.tensor([[1005, -173,   46, -280,  513],
-                         [ 212, 1242,  646,  356,   91],
-                         [ 280,  390, 1010,  295, 1040],
-                         [ 942, 1048,  316,  740, 1154],
-                         [1570,  738,  934,  945, 1477]])
+# tensor_R_1 = torch.tensor([[1005, -173,   46, -280,  513],
+#                          [ 212, 1242,  646,  356,   91],
+#                          [ 280,  390, 1010,  295, 1040],
+#                          [ 942, 1048,  316,  740, 1154],
+#                          [1570,  738,  934,  945, 1477]])
 
-test_image = np.ones((10, 10))
-test_kernel = np.array([[0, 2, 0], [0, 1, 0], [0, 1, 0]])
-expected_result = np.full((10, 10), 4)
+# test_image = np.ones((10, 10))
+# test_kernel = np.array([[0, 2, 0], [0, 1, 0], [0, 1, 0]])
+# expected_result = np.full((10, 10), 4)
 
-print(np.array_equal(convolution_forward_numpy(test_image, test_kernel), expected_result))
+# print(np.array_equal(convolution_forward_numpy(test_image, test_kernel), expected_result))
 
 def convolution_forward_torch(image, kernel):
     # YOUR CODE HERE 
@@ -643,16 +643,16 @@ def convolution_forward_torch(image, kernel):
 assert np.array_equal(convolution_forward_torch(I, K_0), R_0)
 assert np.array_equal(convolution_forward_torch(I, K_1), R_1)
 
-result=convolution_forward_torch(test_image,test_kernel).numpy().astype("uint8")
-print(np.pad(test_image, 1, mode='constant').astype("uint8"))
-print("convolution with")
-print(test_kernel.astype("uint8"))
-print("=")
-print(result)
-print("And should not be equal to:")
-print(expected_result)
-print("So it's:")
-print(np.array_equal(result, expected_result))
+# result=convolution_forward_torch(test_image,test_kernel).numpy().astype("uint8")
+# print(np.pad(test_image, 1, mode='constant').astype("uint8"))
+# print("convolution with")
+# print(test_kernel.astype("uint8"))
+# print("=")
+# print(result)
+# print("And should not be equal to:")
+# print(expected_result)
+# print("So it's:")
+# print(np.array_equal(result, expected_result))
 
 """In pytorch you can also access other layer like convolution2D, pooling layers, for example in the following cell use the __torch.nn.MaxPool2d__ to redduce the image size.
 
@@ -869,15 +869,15 @@ En diminuant la taille du batch on augmente légèrement l'accuracy
 
 - nepoch = 18 :
 Après avoir annalysé les résultats sur 50 epochs, on se rend compte que l'accuracy et la loss finissent par diverger
-et par retomber sur les même valeur. Un aussi grand grand nombre d'epochs n'était donc pas utile. J'ai donc regardé à 
+et par afficher en boucle des valeurs similaires. Un aussi grand grand nombre d'epochs n'était donc pas utile. J'ai donc regardé à 
 partir de quelles epochs les résultats divergeaient et n'augmentaient plus. Et j'ai donc obtenu 18 epochs
 
 - momentum = 0.85 (lors de l'utilisation avec un optim SGD) :
 Lors de l'utilisation de l'optimizer SGD, et en utilisant le site schématisant le fonctionnement du momentum vu en cours,
-j'ai pu estimer que la bonne combinaison entre momentum et elearning_rate était [0.9,0.01].
+j'ai pu estimer que la bonne combinaison entre momentum et elearning_rate se rapprochait de [m = 0.9, lr = 0.01].
 Lors de l'utilisation du SGD, je me suis rendu compte que les résultats divergeaient très rapidement, j'ai donc réduit 
-le momentum à 0.85 et bien que la divergeance arrive plus tard, elle bride toujours le résultat à 0.81 d'accuracy. 
-En diminuant le Learning rate à 0.005, on augmente l'accuracy à 0.85 (pas suffisant)
+le momentum à 0.85 et bien que la divergeance arrive plus tard après changement, elle bride toujours le résultat à 0.81 d'accuracy. 
+En diminuant le Learning rate à 0.005, on augmente l'accuracy à 0.85 (toujours pas suffisant mais mieux)
 
 - Optimizer: Adam && learning_rate = 0.001 :
 Pour franchir le cap des 0.85 d'accuracy j'ai décidé de changer l'optimizer et de prendre Adam avec lequel je n'utilise
@@ -896,7 +896,7 @@ if __name__ == "__main__" :
     # TODO HERE: Upload an image to the notebook in the navigation bar on the left
     # `File` `Load File`and load an image to the notebook. 
     
-    filename = "" 
+    filename = "pytorch-logo.png" 
     # Loading a already trained network in pytorch 
     model = torch.hub.load('pytorch/vision:v0.6.0', 'deeplabv3_resnet101', pretrained=True)
     model.eval()
