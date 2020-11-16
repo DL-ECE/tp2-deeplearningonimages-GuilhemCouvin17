@@ -21,7 +21,7 @@ Please feel free to look arround and look at their API.
 The student should be limited to these imports to complete this work.
 """
 
-!pip install --upgrade pip
+# !pip install --upgrade pip
 
 # Import the different module we will need in this notebook
 import os
